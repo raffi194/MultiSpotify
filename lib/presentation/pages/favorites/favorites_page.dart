@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/di/providers.dart';   // ← WAJIB, satu-satunya import provider
+import '../../../core/di/providers.dart';
 import '../../widgets/navbar_bottom.dart';
 import '../../widgets/song_card.dart';
 
@@ -18,7 +18,7 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
     super.initState();
     Future.microtask(() {
       ref.read(favoriteControllerProvider.notifier).load();
-      ref.read(songsControllerProvider.notifier).load(); // optional: pastikan lagu ter-load
+      ref.read(songsControllerProvider.notifier).load();
     });
   }
 

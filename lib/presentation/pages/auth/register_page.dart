@@ -35,10 +35,12 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                       setState(() => loading = true);
                       try {
                         await ref.read(authControllerProvider.notifier).register(
-                              email.text,
-                              password.text,
+                              email.text.trim(),
+                              password.text.trim(),
                             );
-                        context.go('/');
+
+                        // Setelah register → langsung ke login
+                        context.go('/login');
                       } catch (e) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text(e.toString())),

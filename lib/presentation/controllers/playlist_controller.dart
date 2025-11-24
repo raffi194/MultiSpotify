@@ -2,25 +2,21 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/entities/playlist_entity.dart';
 import '../../domain/entities/song_entity.dart';
 
+// Provider DI (playlistControllerProviderSongs)
+import '../../core/di/providers.dart';
+
+// USECASES
 import '../../application/playlist/list_playlist_user_usecase.dart';
 import '../../application/playlist/list_song_in_playlist_usecase.dart';
 import '../../application/playlist/create_playlist_usecase.dart';
 import '../../application/playlist/add_song_to_playlist_usecase.dart';
 
 
-// ============================================================================
-// PROVIDER: LIST LAGU DALAM PLAYLIST (DETAIL PLAYLIST)
-// ============================================================================
-final playlistControllerProviderSongs =
-    StateNotifierProvider<PlaylistSongsController, AsyncValue<List<SongEntity>>>(
-  (ref) => PlaylistSongsController(),
-);
-
-
-// ============================================================================
-// CONTROLLER UNTUK SONGS DALAM PLAYLIST
-// ============================================================================
-class PlaylistSongsController extends StateNotifier<AsyncValue<List<SongEntity>>> {
+// =======================================================
+// CONTROLLER: SONGS IN PLAYLIST (Detail Playlist)
+// =======================================================
+class PlaylistSongsController
+    extends StateNotifier<AsyncValue<List<SongEntity>>> {
   PlaylistSongsController() : super(const AsyncValue.loading());
 
   void setLoading() => state = const AsyncValue.loading();
@@ -29,10 +25,11 @@ class PlaylistSongsController extends StateNotifier<AsyncValue<List<SongEntity>>
 }
 
 
-// ============================================================================
+// =======================================================
 // CONTROLLER UTAMA PLAYLIST
-// ============================================================================
-class PlaylistController extends StateNotifier<AsyncValue<List<PlaylistEntity>>> {
+// =======================================================
+class PlaylistController
+    extends StateNotifier<AsyncValue<List<PlaylistEntity>>> {
   final ListPlaylistUserUsecase listPlaylistUser;
   final CreatePlaylistUsecase createPlaylist;
   final AddSongToPlaylistUsecase addSongToPlaylist;
@@ -48,9 +45,9 @@ class PlaylistController extends StateNotifier<AsyncValue<List<PlaylistEntity>>>
     required this.ref,
   }) : super(const AsyncValue.loading());
 
-  // ==========================================================================
-  // LOAD SEMUA PLAYLIST USER
-  // ==========================================================================
+  // ===================================================
+  // LOAD PLAYLIST USER
+  // ===================================================
   Future<void> loadPlaylists(String userId) async {
     state = const AsyncValue.loading();
     try {
@@ -61,34 +58,36 @@ class PlaylistController extends StateNotifier<AsyncValue<List<PlaylistEntity>>>
     }
   }
 
-  // ==========================================================================
-  // BUAT PLAYLIST
-  // ==========================================================================
-  Future<void> create(String name, String description, String userId) async {
+  // ===================================================
+  // CREATE PLAYLIST
+  // ===================================================
+  Future<void> create(
+      String name, String description, String userId) async {
     await createPlaylist.execute(name, description);
     await loadPlaylists(userId);
   }
 
-  // ==========================================================================
-  // TAMBAHKAN LAGU KE PLAYLIST
-  // ==========================================================================
-  Future<void> addToPlaylist(String playlistId, String songId, String userId) async {
+  // ===================================================
+  // ADD SONG TO PLAYLIST
+  // ===================================================
+  Future<void> addToPlaylist(
+      String playlistId, String songId, String userId) async {
     await addSongToPlaylist.execute(playlistId, songId);
     await loadPlaylists(userId);
   }
 
-  // ==========================================================================
-  // LOAD LAGU DALAM PLAYLIST
-  // ==========================================================================
+  // ===================================================
+  // LOAD SONGS IN PLAYLIST (DETAIL PLAYLIST)
+  // ===================================================
   Future<void> loadSongsInPlaylist(String playlistId) async {
-    final songsState = ref.read(playlistControllerProviderSongs.notifier);
-    songsState.setLoading();
+    final songState = ref.read(playlistControllerProviderSongs.notifier);
+    songState.setLoading();
 
     try {
       final data = await listSongsInPlaylist.execute(playlistId);
-      songsState.setData(data);
+      songState.setData(data);
     } catch (e, s) {
-      songsState.setError(e, s);
+      songState.setError(e, s);
     }
   }
 }

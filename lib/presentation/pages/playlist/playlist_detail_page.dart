@@ -2,11 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/di/providers.dart';
-import '../../controllers/playlist_controller.dart';
 import '../../widgets/song_card.dart';
 import '../../widgets/navbar_bottom.dart';
-import '../../controllers/playlist_controller.dart';
-
 
 class PlaylistDetailPage extends ConsumerStatefulWidget {
   final String playlistId;
@@ -26,6 +23,7 @@ class _PlaylistDetailPageState
   @override
   void initState() {
     super.initState();
+
     Future.microtask(() async {
       final user = ref.read(authControllerProvider);
       if (user != null) {
@@ -41,9 +39,7 @@ class _PlaylistDetailPageState
     final playlistSongs = ref.watch(playlistControllerProviderSongs);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Detail Playlist"),
-      ),
+      appBar: AppBar(title: const Text("Detail Playlist")),
       bottomNavigationBar: const NavbarBottom(index: 2),
       body: playlistSongs.when(
         data: (songs) {
@@ -61,8 +57,8 @@ class _PlaylistDetailPageState
             children: songs.map((song) => SongCard(song: song)).toList(),
           );
         },
-        loading: () => const Center(
-            child: CircularProgressIndicator(color: Colors.white)),
+        loading: () =>
+            const Center(child: CircularProgressIndicator(color: Colors.white)),
         error: (e, s) => Center(
           child: Text(
             "Terjadi kesalahan: $e",

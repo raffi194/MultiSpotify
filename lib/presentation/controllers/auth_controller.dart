@@ -17,16 +17,17 @@ class AuthController extends StateNotifier<UserEntity?> {
 
   Future<void> login(String email, String password) async {
     final user = await loginUsecase.execute(email, password);
+
+    if (user == null) {
+      throw Exception("Login gagal");
+    }
+
     state = user;
   }
 
   Future<void> register(String email, String password) async {
-    final user = await registerUsecase.execute(email, password);
-    state = user;
-  }
-
-  Future<void> loadUserSession() async {
-    state = await getCurrentUserUsecase.execute();
+    await registerUsecase.execute(email, password);
+    state = null;
   }
 
   void logout() {

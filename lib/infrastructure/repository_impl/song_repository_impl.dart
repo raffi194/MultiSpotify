@@ -1,18 +1,29 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
+
 import '../../domain/entities/song_entity.dart';
 import '../../domain/repositories/song_repository.dart';
 import '../dto/song_dto.dart';
-import '../supabase/supabase_client.dart';
 
 class SongRepositoryImpl implements SongRepository {
-  final client = SupabaseService.client;
+  final SupabaseClient client = Supabase.instance.client;
 
   @override
   Future<List<SongEntity>> fetchAll() async {
-    final response = await client.from('songs').select().order('created_at');
+    // Query aman + cek error
+    final response = await client
+        .from('songs')
+        .select('*')
+        .order('created_at', ascending: false);
 
-    return (response as List<dynamic>)
-        .map((e) => SongDto.fromJson(e))
+    // Jika null → return empty (tidak crash)
+    if (response == null) return [];
+
+    if (response is! List) {
+      throw Exception("Format data songs tidak valid");
+    }
+
+    return response
+        .map((row) => SongDto.fromJson(row))
         .map(
           (dto) => SongEntity(
             id: dto.id,
@@ -27,16 +38,25 @@ class SongRepositoryImpl implements SongRepository {
 
   @override
   Future<void> uploadSong(SongEntity song) async {
-    await client.from('songs').insert({
+    final res = await client.from('songs').insert({
       'title': song.title,
       'artist': song.artist,
       'cover_url': song.coverUrl,
       'audio_url': song.audioUrl,
     });
+
+    if (res is PostgrestException) {
+      throw Exception("Gagal upload lagu: ${res.message}");
+    }
   }
 
   @override
   Future<void> deleteSong(String id) async {
-    await client.from('songs').delete().eq('id', id);
+    final res =
+        await client.from('songs').delete().eq('id', id);
+
+    if (res is PostgrestException) {
+      throw Exception("Gagal delete lagu: ${res.message}");
+    }
   }
 }

@@ -5,6 +5,7 @@ import '../../../core/di/providers.dart';
 import '../../helpers/favorite_helper.dart';
 import '../../widgets/audio_player_widget.dart';
 import '../../widgets/navbar_bottom.dart';
+import '../playlist/playlist_picker_modal.dart';
 
 class SongDetailPage extends ConsumerWidget {
   final String songId;
@@ -14,9 +15,6 @@ class SongDetailPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final songs = ref.watch(songsControllerProvider);
 
-    // ===========================================================
-    // SAFE FIND SONG (tanpa error null type)
-    // ===========================================================
     final songList = songs.value ?? [];
     final song = songList.where((e) => e.id == songId).isNotEmpty
         ? songList.firstWhere((e) => e.id == songId)
@@ -58,6 +56,21 @@ class SongDetailPage extends ConsumerWidget {
                   FavoriteHelper.handleFavorite(context, ref, songId),
               icon: const Icon(Icons.favorite),
               label: const Text("Favoritkan"),
+            ),
+
+            const SizedBox(height: 12),
+
+            ElevatedButton.icon(
+              onPressed: () {
+                showModalBottomSheet(
+                  context: context,
+                  backgroundColor: Colors.black87,
+                  builder: (_) =>
+                      PlaylistPickerModal(songId: song.id),
+                );
+              },
+              icon: const Icon(Icons.playlist_add),
+              label: const Text("Tambahkan ke Playlist"),
             ),
           ],
         ),

@@ -1,19 +1,22 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../../domain/repositories/auth_repository.dart';
-import '../../domain/entities/user_entity.dart';
+import '../../../domain/repositories/auth_repository.dart';
+import '../../../domain/entities/user_entity.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   final SupabaseClient client = Supabase.instance.client;
 
   @override
-  Future<UserEntity> login(String email, String password) async {
-    final res = await client.auth.signInWithPassword(
+  Future<UserEntity?> login(String email, String password) async {
+    final response = await client.auth.signInWithPassword(
       email: email,
       password: password,
     );
 
-    final user = res.user;
-    if (user == null) throw Exception("Login gagal");
+    final user = response.user;
+
+    if (user == null) {
+      throw AuthException("Email atau password salah.");
+    }
 
     return UserEntity(
       id: user.id,
@@ -22,14 +25,17 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<UserEntity> register(String email, String password) async {
-    final res = await client.auth.signUp(
+  Future<UserEntity?> register(String email, String password) async {
+    final response = await client.auth.signUp(
       email: email,
       password: password,
     );
 
-    final user = res.user;
-    if (user == null) throw Exception("Gagal membuat akun");
+    final user = response.user;
+
+    if (user == null) {
+      return null;
+    }
 
     return UserEntity(
       id: user.id,
@@ -52,4 +58,12 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<void> logout() async {
     await client.auth.signOut();
   }
+}
+
+class AuthException implements Exception {
+  final String message;
+  AuthException(this.message);
+
+  @override
+  String toString() => message;
 }

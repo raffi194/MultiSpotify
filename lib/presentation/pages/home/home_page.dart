@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../widgets/navbar_bottom.dart';
+
 import '../../../core/di/providers.dart';
+import '../../widgets/navbar_bottom.dart';
 import '../../widgets/song_card.dart';
 
 class HomePage extends ConsumerStatefulWidget {

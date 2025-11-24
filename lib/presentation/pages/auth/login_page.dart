@@ -17,6 +17,15 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final authState = ref.watch(authControllerProvider);
+
+    // Jika user berhasil login → langsung redirect
+    if (authState != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (context.mounted) context.go('/');
+      });
+    }
+
     return Scaffold(
       appBar: AppBar(title: const Text("Login")),
       body: Padding(
@@ -35,10 +44,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                       setState(() => loading = true);
                       try {
                         await ref.read(authControllerProvider.notifier).login(
-                              email.text,
-                              password.text,
+                              email.text.trim(),
+                              password.text.trim(),
                             );
-                        context.go('/');
                       } catch (e) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text(e.toString())),

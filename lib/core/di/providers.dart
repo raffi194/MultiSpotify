@@ -1,102 +1,145 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-// DOMAIN
+//
+// =============================================================
+// ENTITY IMPORTS
+// =============================================================
+import '../../domain/entities/song_entity.dart';
+import '../../domain/entities/favorite_entity.dart';
+import '../../domain/entities/playlist_entity.dart';
+import '../../domain/entities/user_entity.dart'; // ← WAJIB, yang tadi hilang
+
+//
+// =============================================================
+// DOMAIN REPOSITORIES
+// =============================================================
 import '../../domain/repositories/auth_repository.dart';
 import '../../domain/repositories/song_repository.dart';
 import '../../domain/repositories/playlist_repository.dart';
 import '../../domain/repositories/favorite_repository.dart';
 
-// INFRA
+//
+// =============================================================
+// INFRASTRUCTURE IMPLEMENTATIONS
+// =============================================================
 import '../../infrastructure/repository_impl/auth_repository_impl.dart';
 import '../../infrastructure/repository_impl/song_repository_impl.dart';
 import '../../infrastructure/repository_impl/playlist_repository_impl.dart';
 import '../../infrastructure/repository_impl/favorite_repository_impl.dart';
 
+//
+// =============================================================
 // USECASES
+// =============================================================
+
+// AUTH (langsung nanti dibuat di controller)
 import '../../application/auth/login_usecase.dart';
 import '../../application/auth/register_usecase.dart';
 import '../../application/auth/get_current_user_usecase.dart';
 
+// SONGS
 import '../../application/songs/fetch_all_songs_usecase.dart';
 import '../../application/songs/upload_song_usecase.dart';
 
+// PLAYLIST
 import '../../application/playlist/list_playlist_user_usecase.dart';
 import '../../application/playlist/list_song_in_playlist_usecase.dart';
 import '../../application/playlist/create_playlist_usecase.dart';
 import '../../application/playlist/add_song_to_playlist_usecase.dart';
 
+// FAVORITES
 import '../../application/favorites/list_favorites_usecase.dart';
 import '../../application/favorites/mark_favorite_usecase.dart';
 
+//
+// =============================================================
 // CONTROLLERS
+// =============================================================
 import '../../presentation/controllers/auth_controller.dart';
 import '../../presentation/controllers/songs_controller.dart';
 import '../../presentation/controllers/playlist_controller.dart';
 import '../../presentation/controllers/favorite_controller.dart';
 
+//
+// =============================================================
+// REPOSITORY PROVIDERS
+// =============================================================
+final authRepositoryProvider = Provider<AuthRepository>((ref) {
+  return AuthRepositoryImpl();
+});
 
-/// =============================================================
-/// REPOSITORIES
-/// =============================================================
-final authRepositoryProvider = Provider<AuthRepository>((ref) => AuthRepositoryImpl());
-final songRepositoryProvider = Provider<SongRepository>((ref) => SongRepositoryImpl());
-final playlistRepositoryProvider = Provider<PlaylistRepository>((ref) => PlaylistRepositoryImpl());
-final favoriteRepositoryProvider = Provider<FavoriteRepository>((ref) => FavoriteRepositoryImpl());
+final songRepositoryProvider = Provider<SongRepository>((ref) {
+  return SongRepositoryImpl();
+});
 
+final playlistRepositoryProvider = Provider<PlaylistRepository>((ref) {
+  return PlaylistRepositoryImpl();
+});
 
-/// =============================================================
-/// USECASES
-/// =============================================================
+final favoriteRepositoryProvider = Provider<FavoriteRepository>((ref) {
+  return FavoriteRepositoryImpl();
+});
 
-// Auth
-final loginUsecaseProvider = Provider((ref) => LoginUsecase(ref.watch(authRepositoryProvider)));
-final registerUsecaseProvider = Provider((ref) => RegisterUsecase(ref.watch(authRepositoryProvider)));
-final getCurrentUserUsecaseProvider = Provider((ref) => GetCurrentUserUsecase(ref.watch(authRepositoryProvider)));
+//
+// =============================================================
+// USECASE PROVIDERS (Songs, Playlist, Favorites)
+// =============================================================
 
-// Songs
-final fetchAllSongsUsecaseProvider =
-    Provider((ref) => FetchAllSongsUsecase(ref.watch(songRepositoryProvider)));
+// SONGS
+final fetchAllSongsUsecaseProvider = Provider(
+  (ref) => FetchAllSongsUsecase(ref.watch(songRepositoryProvider)),
+);
 
-final uploadSongUsecaseProvider =
-    Provider((ref) => UploadSongUsecase(ref.watch(songRepositoryProvider)));
+final uploadSongUsecaseProvider = Provider(
+  (ref) => UploadSongUsecase(ref.watch(songRepositoryProvider)),
+);
 
+// PLAYLIST
+final listPlaylistUserUsecaseProvider = Provider(
+  (ref) => ListPlaylistUserUsecase(ref.watch(playlistRepositoryProvider)),
+);
 
-// Playlist
-final listPlaylistUserUsecaseProvider =
-    Provider((ref) => ListPlaylistUserUsecase(ref.watch(playlistRepositoryProvider)));
+final listSongsInPlaylistUsecaseProvider = Provider(
+  (ref) => ListSongsInPlaylistUsecase(ref.watch(playlistRepositoryProvider)),
+);
 
-final listSongsInPlaylistUsecaseProvider =
-    Provider((ref) => ListSongsInPlaylistUsecase(ref.watch(playlistRepositoryProvider)));
+final createPlaylistUsecaseProvider = Provider(
+  (ref) => CreatePlaylistUsecase(ref.watch(playlistRepositoryProvider)),
+);
 
-final createPlaylistUsecaseProvider =
-    Provider((ref) => CreatePlaylistUsecase(ref.watch(playlistRepositoryProvider)));
+final addSongToPlaylistUsecaseProvider = Provider(
+  (ref) => AddSongToPlaylistUsecase(ref.watch(playlistRepositoryProvider)),
+);
 
-final addSongToPlaylistUsecaseProvider =
-    Provider((ref) => AddSongToPlaylistUsecase(ref.watch(playlistRepositoryProvider)));
+// FAVORITES
+final listFavoritesUsecaseProvider = Provider(
+  (ref) => ListFavoritesUsecase(ref.watch(favoriteRepositoryProvider)),
+);
 
+final markFavoriteUsecaseProvider = Provider(
+  (ref) => MarkFavoriteUsecase(ref.watch(favoriteRepositoryProvider)),
+);
 
-// Favorites
-final listFavoritesUsecaseProvider =
-    Provider((ref) => ListFavoritesUsecase(ref.watch(favoriteRepositoryProvider)));
+//
+// =============================================================
+// CONTROLLER PROVIDERS
+// =============================================================
 
-final markFavoriteUsecaseProvider =
-    Provider((ref) => MarkFavoriteUsecase(ref.watch(favoriteRepositoryProvider)));
+// AUTH CONTROLLER (tanpa usecase providers — langsung instance usecase)
+final authControllerProvider =
+    StateNotifierProvider<AuthController, UserEntity?>((ref) {
+  final repo = ref.watch(authRepositoryProvider);
 
-
-/// =============================================================
-/// CONTROLLERS
-/// =============================================================
-
-final authControllerProvider = StateNotifierProvider<AuthController, dynamic>((ref) {
   return AuthController(
-    loginUsecase: ref.watch(loginUsecaseProvider),
-    registerUsecase: ref.watch(registerUsecaseProvider),
-    getCurrentUserUsecase: ref.watch(getCurrentUserUsecaseProvider),
+    loginUsecase: LoginUsecase(repo),
+    registerUsecase: RegisterUsecase(repo),
+    getCurrentUserUsecase: GetCurrentUserUsecase(repo),
   );
 });
 
+// SONGS CONTROLLER
 final songsControllerProvider =
-    StateNotifierProvider<SongsController, dynamic>((ref) {
+    StateNotifierProvider<SongsController, AsyncValue<List<SongEntity>>>((ref) {
   return SongsController(
     ref.watch(fetchAllSongsUsecaseProvider),
     ref.watch(uploadSongUsecaseProvider),
@@ -104,8 +147,9 @@ final songsControllerProvider =
   );
 });
 
+// PLAYLIST CONTROLLER
 final playlistControllerProvider =
-    StateNotifierProvider<PlaylistController, dynamic>((ref) {
+    StateNotifierProvider<PlaylistController, AsyncValue<List<PlaylistEntity>>>((ref) {
   return PlaylistController(
     listPlaylistUser: ref.watch(listPlaylistUserUsecaseProvider),
     createPlaylist: ref.watch(createPlaylistUsecaseProvider),
@@ -115,10 +159,17 @@ final playlistControllerProvider =
   );
 });
 
+// FAVORITE CONTROLLER
 final favoriteControllerProvider =
-    StateNotifierProvider<FavoriteController, dynamic>((ref) {
+    StateNotifierProvider<FavoriteController, AsyncValue<List<FavoriteEntity>>>((ref) {
   return FavoriteController(
     listFavorites: ref.watch(listFavoritesUsecaseProvider),
     markFavorite: ref.watch(markFavoriteUsecaseProvider),
   );
+});
+
+// PLAYLIST SONGS CONTROLLER (untuk detail playlist)
+final playlistControllerProviderSongs =
+    StateNotifierProvider<PlaylistSongsController, AsyncValue<List<SongEntity>>>((ref) {
+  return PlaylistSongsController();
 });
