@@ -10,16 +10,28 @@ class FavoriteController extends StateNotifier<AsyncValue<List<FavoriteEntity>>>
   FavoriteController({
     required this.listFavorites,
     required this.markFavorite,
-  }) : super(const AsyncValue.loading());
-
-  Future<void> load() async {
-    state = const AsyncValue.loading();
-    final data = await listFavorites.execute();
-    state = AsyncValue.data(data);
+  }) : super(const AsyncValue.loading()) {
+    fetchFavorites();
   }
 
-  Future<void> add(String songId) async {
-    await markFavorite.execute(songId);
-    await load();
+  Future<void> fetchFavorites() async {
+    try {
+      final favorites = await listFavorites.execute();
+      state = AsyncValue.data(favorites);
+    } catch (e) {
+      state = AsyncValue.error(e, StackTrace.current);
+    }
+  }
+
+  Future<void> toggleFavorite(String songId) async {
+    try {
+      await markFavorite.execute(songId);
+
+      // after marking favorite, refresh list
+      final favorites = await listFavorites.execute();
+      state = AsyncValue.data(favorites);
+    } catch (e) {
+      state = AsyncValue.error(e, StackTrace.current);
+    }
   }
 }

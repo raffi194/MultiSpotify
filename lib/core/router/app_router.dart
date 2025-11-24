@@ -15,11 +15,11 @@ import '../../presentation/pages/playlist/playlist_detail_page.dart';
 import '../../presentation/pages/favorites/favorites_page.dart';
 import '../../presentation/pages/admin/add_song_page.dart';
 import '../../presentation/pages/playlist/playlist_editor_page.dart';
+import '../../presentation/widgets/player/full_player_page.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     initialLocation: '/login',
-
     redirect: (context, state) {
       final user = ref.read(authControllerProvider);
 
@@ -39,7 +39,6 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       return null;
     },
-
     routes: [
       GoRoute(path: '/login', builder: (_, __) => const LoginPage()),
       GoRoute(path: '/register', builder: (_, __) => const RegisterPage()),
@@ -62,6 +61,10 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (_, __) => const PlaylistEditorPage(),
       ),
       GoRoute(path: '/admin/add-song', builder: (_, __) => const AddSongPage()),
+      GoRoute(
+        path: '/player',
+        builder: (_, __) => const FullPlayerPage(),
+      ),
     ],
   );
 });

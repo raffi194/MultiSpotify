@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/di/providers.dart';
 import '../../widgets/navbar_bottom.dart';
-import '../../widgets/song_card.dart';
+import '../../widgets/song/song_card.dart';
 
 class FavoritesPage extends ConsumerStatefulWidget {
   const FavoritesPage({super.key});
@@ -16,33 +16,66 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
   @override
   void initState() {
     super.initState();
+
+    // Memuat ulang data favorit dan lagu menggunakan method yang BENAR
     Future.microtask(() {
-      ref.read(favoriteControllerProvider.notifier).load();
+      ref.read(favoriteControllerProvider.notifier).fetchFavorites();
       ref.read(songsControllerProvider.notifier).load();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final favorites = ref.watch(favoriteControllerProvider);
-    final allSongs = ref.watch(songsControllerProvider).value ?? [];
+    final favoritesAsync = ref.watch(favoriteControllerProvider);
+    final songsAsync = ref.watch(songsControllerProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Favorit")),
+      backgroundColor: const Color(0xFF0C0C0C),
+      appBar: AppBar(
+        title: const Text("Favorit"),
+        backgroundColor: const Color(0xFF121212),
+      ),
       bottomNavigationBar: const NavbarBottom(index: 3),
-      body: favorites.when(
-        data: (list) {
-          final favSongs = allSongs
-              .where((song) => list.any((f) => f.songId == song.id))
-              .toList();
+      body: favoritesAsync.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (err, st) => Center(
+          child: Text(
+            "Gagal memuat favorit: $err",
+            style: const TextStyle(color: Colors.redAccent),
+          ),
+        ),
+        data: (favoriteList) {
+          return songsAsync.when(
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (err, st) => Center(
+              child: Text(
+                "Gagal memuat lagu: $err",
+                style: const TextStyle(color: Colors.redAccent),
+              ),
+            ),
+            data: (songs) {
+              final favSongs = songs
+                  .where((song) =>
+                      favoriteList.any((fav) => fav.songId == song.id))
+                  .toList();
 
-          return ListView(
-            padding: const EdgeInsets.all(16),
-            children: favSongs.map((s) => SongCard(song: s)).toList(),
+              if (favSongs.isEmpty) {
+                return const Center(
+                  child: Text(
+                    "Belum ada lagu favorit.",
+                    style: TextStyle(color: Colors.white54, fontSize: 16),
+                  ),
+                );
+              }
+
+              return ListView.builder(
+                padding: const EdgeInsets.all(16),
+                itemCount: favSongs.length,
+                itemBuilder: (_, i) => SongCard(song: favSongs[i]),
+              );
+            },
           );
         },
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, s) => Center(child: Text(e.toString())),
       ),
     );
   }

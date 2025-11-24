@@ -1,5 +1,4 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
-
 import '../../domain/entities/song_entity.dart';
 import '../../domain/repositories/song_repository.dart';
 import '../dto/song_dto.dart';
@@ -9,17 +8,13 @@ class SongRepositoryImpl implements SongRepository {
 
   @override
   Future<List<SongEntity>> fetchAll() async {
-    // Query aman + cek error
     final response = await client
         .from('songs')
         .select('*')
         .order('created_at', ascending: false);
 
-    // Jika null → return empty (tidak crash)
-    if (response == null) return [];
-
-    if (response is! List) {
-      throw Exception("Format data songs tidak valid");
+    if (response == null || response is! List) {
+      return [];
     }
 
     return response
@@ -42,7 +37,7 @@ class SongRepositoryImpl implements SongRepository {
       'title': song.title,
       'artist': song.artist,
       'cover_url': song.coverUrl,
-      'audio_url': song.audioUrl,
+      'audio_url': song.audioUrl, // ← PENTING
     });
 
     if (res is PostgrestException) {
@@ -52,8 +47,7 @@ class SongRepositoryImpl implements SongRepository {
 
   @override
   Future<void> deleteSong(String id) async {
-    final res =
-        await client.from('songs').delete().eq('id', id);
+    final res = await client.from('songs').delete().eq('id', id);
 
     if (res is PostgrestException) {
       throw Exception("Gagal delete lagu: ${res.message}");
