@@ -1,0 +1,41 @@
+name: basic_widget
+description: "A new Flutter project."
+publish_to: 'none'
+
+version: 0.1.0
+
+environment:
+  sdk: ^3.6.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+    
+  # STATE MANAGEMENT
+  flutter_riverpod: ^2.5.1
+
+  # ROUTING
+  go_router: ^14.2.3
+
+  # BACKEND SUPABASE
+  supabase_flutter: ^2.5.8
+
+  # AUDIO PLAYER
+  just_audio: ^0.9.37
+
+  # FILE PICKER (COVER + AUDIO UPLOAD)
+  file_picker: ^8.0.0
+
+  # CACHED NETWORK IMAGE
+  cached_network_image: ^3.3.1
+
+  # (Optional) If still want flutter_bloc, you can keep it:
+  flutter_bloc: ^9.1.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
