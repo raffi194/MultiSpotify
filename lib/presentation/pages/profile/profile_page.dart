@@ -8,6 +8,7 @@ import '../../../core/di/providers.dart';
 import '../../widgets/profile/profile_edit_modal.dart';
 import '../../widgets/profile/playlist_preview_list.dart';
 import '../../widgets/profile/playlist_preview_shimmer.dart';
+import '../../widgets/song/song_upload_modal.dart';
 
 class ProfilePage extends ConsumerStatefulWidget {
   const ProfilePage({super.key});
@@ -38,9 +39,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     final playlists = ref.watch(playlistControllerProvider);
     final user = ref.watch(authControllerProvider);
 
-    final initial = (user?.email.isNotEmpty ?? false)
-        ? user!.email[0].toUpperCase()
-        : "?";
+    final initial =
+        (user?.email.isNotEmpty ?? false) ? user!.email[0].toUpperCase() : "?";
 
     return NotificationListener<ScrollUpdateNotification>(
       onNotification: (scroll) {
@@ -61,21 +61,15 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 background: Stack(
                   alignment: Alignment.center,
                   children: [
-                    // BACKGROUND GRADIENT
                     Container(
                       decoration: const BoxDecoration(
                         gradient: LinearGradient(
-                          colors: [
-                            Color(0xFF202020),
-                            Color(0xFF0C0C0C),
-                          ],
+                          colors: [Color(0xFF202020), Color(0xFF0C0C0C)],
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
                         ),
                       ),
                     ),
-
-                    // AVATAR PARALLAX + HERO
                     Transform.translate(
                       offset: Offset(0, avatarOffset),
                       child: Hero(
@@ -99,13 +93,13 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               ),
             ),
 
+            // CONTENT BODY
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.all(20),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // EMAIL
                     Text(
                       user?.email ?? "",
                       style: const TextStyle(
@@ -114,9 +108,32 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                         fontWeight: FontWeight.w600,
                       ),
                     ),
+
                     const SizedBox(height: 20),
 
-                    // EDIT PROFILE Button → Bottom Sheet
+                    // =========================================================
+                    // BUTTON: Kembali ke Home
+                    // =========================================================
+                    ElevatedButton(
+                      onPressed: () => context.go('/'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white10,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          side: const BorderSide(color: Colors.white24),
+                        ),
+                      ),
+                      child: const Text(
+                        "Kembali ke Home",
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // EDIT PROFILE
                     ElevatedButton(
                       onPressed: () => showModalBottomSheet(
                         context: context,
@@ -129,7 +146,42 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
                     const SizedBox(height: 30),
 
-                    // PLAYLIST SECTION TITLE
+                    // UPLOAD LAGU
+                    ElevatedButton(
+                      onPressed: () {
+                        showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true,
+                          backgroundColor: Colors.transparent,
+                          builder: (_) => const SongUploadModal(),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.greenAccent.shade700,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: const Text(
+                        "Upload Lagu",
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    ElevatedButton(
+                      onPressed: () => context.push('/my-songs'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blueAccent,
+                      ),
+                      child: const Text("Lihat Lagu Saya"),
+                    ),
+
+                    const SizedBox(height: 30),
+
+                    // PLAYLIST HEADER
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -147,12 +199,12 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                             "Lihat Semua",
                             style: TextStyle(color: Colors.white70),
                           ),
-                        )
+                        ),
                       ],
                     ),
+
                     const SizedBox(height: 10),
 
-                    // PLAYLIST COUNTER
                     playlists.maybeWhen(
                       data: (list) {
                         return Text(
@@ -168,7 +220,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
                     const SizedBox(height: 20),
 
-                    // PLAYLIST PREVIEW LIST
                     playlists.when(
                       data: (list) => list.isEmpty
                           ? const Text(
@@ -188,14 +239,17 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                     // LOGOUT
                     ElevatedButton(
                       onPressed: () async {
-                        await ref.read(authControllerProvider.notifier).logout();
+                        await ref
+                            .read(authControllerProvider.notifier)
+                            .logout();
                         context.go('/login');
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.redAccent,
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10)),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
                       ),
                       child: const Center(
                         child: Text(

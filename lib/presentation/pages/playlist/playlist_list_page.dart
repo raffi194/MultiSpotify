@@ -37,8 +37,11 @@ class _PlaylistListPageState extends ConsumerState<PlaylistListPage> {
         backgroundColor: const Color(0xFF0C0C0C),
       ),
 
+      // ==========================================================
+      // FLOATING BUTTON → BUAT PLAYLIST
+      // ==========================================================
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.push('/playlist-editor'),
+        onPressed: () => context.push('/playlist-create'),
         backgroundColor: Colors.greenAccent.shade700,
         icon: const Icon(Icons.add),
         label: const Text("Buat Playlist"),
@@ -46,6 +49,7 @@ class _PlaylistListPageState extends ConsumerState<PlaylistListPage> {
 
       body: playlists.when(
         loading: () => const Center(child: CircularProgressIndicator()),
+
         error: (e, s) => Center(
           child: Text(
             "Gagal memuat playlist",
@@ -75,6 +79,7 @@ class _PlaylistListPageState extends ConsumerState<PlaylistListPage> {
             ),
             itemBuilder: (context, i) {
               final p = list[i];
+
               return Stack(
                 children: [
                   PlaylistCard(playlist: p),
@@ -85,30 +90,37 @@ class _PlaylistListPageState extends ConsumerState<PlaylistListPage> {
                     child: PopupMenuButton(
                       icon: const Icon(Icons.more_vert, color: Colors.white70),
                       color: const Color(0xFF1A1A1A),
+
                       onSelected: (value) async {
                         if (value == "delete") {
                           await ref
                               .read(playlistControllerProvider.notifier)
                               .delete(p.id, user!.id);
                         }
+
                         if (value == "edit") {
-                          context.push('/playlist-editor?edit=${p.id}');
+                          context.push('/playlist-edit/${p.id}');
                         }
                       },
+
                       itemBuilder: (_) => [
                         const PopupMenuItem(
                           value: "edit",
-                          child: Text("Edit Playlist",
-                              style: TextStyle(color: Colors.white)),
+                          child: Text(
+                            "Edit Playlist",
+                            style: TextStyle(color: Colors.white),
+                          ),
                         ),
                         const PopupMenuItem(
                           value: "delete",
-                          child: Text("Hapus Playlist",
-                              style: TextStyle(color: Colors.redAccent)),
+                          child: Text(
+                            "Hapus Playlist",
+                            style: TextStyle(color: Colors.redAccent),
+                          ),
                         ),
                       ],
                     ),
-                  )
+                  ),
                 ],
               );
             },

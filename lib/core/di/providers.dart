@@ -49,6 +49,7 @@ import '../../application/playlist/list_song_in_playlist_usecase.dart';
 import '../../application/playlist/create_playlist_usecase.dart';
 import '../../application/playlist/add_song_to_playlist_usecase.dart';
 import '../../application/playlist/remove_song_from_playlist_usecase.dart';
+import '../../application/playlist/update_playlist_usecase.dart';
 
 // FAVORITES
 import '../../application/favorites/list_favorites_usecase.dart';
@@ -170,6 +171,12 @@ final updateProfileUsecaseProvider =
     Provider((ref) => UpdateProfileUsecase(ref.watch(userRepositoryProvider)));
 
 // PLAYLIST CONTROLLER
+// Tambahkan Usecase Provider
+final updatePlaylistUsecaseProvider = Provider(
+  (ref) => UpdatePlaylistUsecase(ref.watch(playlistRepositoryProvider)),
+);
+
+// PLAYLIST CONTROLLER PROVIDER
 final playlistControllerProvider =
     StateNotifierProvider<PlaylistController, AsyncValue<List<PlaylistEntity>>>((ref) {
   return PlaylistController(
@@ -177,10 +184,13 @@ final playlistControllerProvider =
     createPlaylist: ref.watch(createPlaylistUsecaseProvider),
     addSongToPlaylist: ref.watch(addSongToPlaylistUsecaseProvider),
     listSongsInPlaylist: ref.watch(listSongsInPlaylistUsecaseProvider),
-    removeSongUsecase: ref.watch(removeSongUsecaseProvider), // ← FIXED
+    removeSongUsecase: ref.watch(removeSongUsecaseProvider),
+
+    updatePlaylistUsecase: ref.watch(updatePlaylistUsecaseProvider), // FIX
+
     ref: ref,
   );
-}); 
+});
 
 // FAVORITE CONTROLLER
 final favoriteControllerProvider =

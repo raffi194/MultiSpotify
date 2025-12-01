@@ -1,5 +1,4 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import '../../domain/entities/playlist_entity.dart';
 import '../../domain/entities/song_entity.dart';
 
@@ -9,8 +8,9 @@ import '../../application/playlist/list_song_in_playlist_usecase.dart';
 import '../../application/playlist/create_playlist_usecase.dart';
 import '../../application/playlist/add_song_to_playlist_usecase.dart';
 import '../../application/playlist/remove_song_from_playlist_usecase.dart';
+import '../../application/playlist/update_playlist_usecase.dart'; // <-- penting
 
-// Provider DI
+// Provider
 import '../../core/di/providers.dart';
 
 class PlaylistSongsController
@@ -29,7 +29,9 @@ class PlaylistController
   final AddSongToPlaylistUsecase addSongToPlaylist;
   final ListSongsInPlaylistUsecase listSongsInPlaylist;
   final RemoveSongFromPlaylistUsecase removeSongUsecase;
+  final UpdatePlaylistUsecase updatePlaylistUsecase; // <-- penting
   final Ref ref;
+
   Map<String, String?> playlistCovers = {};
 
   PlaylistController({
@@ -38,6 +40,7 @@ class PlaylistController
     required this.addSongToPlaylist,
     required this.listSongsInPlaylist,
     required this.removeSongUsecase,
+    required this.updatePlaylistUsecase, // <-- penting
     required this.ref,
   }) : super(const AsyncValue.loading());
 
@@ -51,39 +54,35 @@ class PlaylistController
     }
   }
 
-  Future<void> loadPlaylistsWithoutSongs(String userId) async {
-    try {
-      final data = await listPlaylistUser.execute(userId);
-      state = AsyncValue.data(data);
-    } catch (e, s) {
-      state = AsyncValue.error(e, s);
-    }
-  }
-
-  Future<void> loadPlaylistCovers(String userId) async {
-    final repo = ref.read(playlistRepositoryProvider);
-    final playlistsList = await listPlaylistUser.execute(userId);
-
-    final Map<String, String?> covers = {};
-
-    for (final p in playlistsList) {
-      final cover = await repo.fetchFirstSongCover(p.id);
-      covers[p.id] = cover;
-    }
-
-    playlistCovers = covers;
-  }
-
   Future<void> create(String name, String description, String userId) async {
     await createPlaylist.execute(name, description);
     await loadPlaylists(userId);
   }
 
+  Future<void> updatePlaylist(
+    String playlistId,
+    String newName,
+    String newDescription,
+    String userId,
+  ) async {
+    try {
+      await updatePlaylistUsecase.execute(
+        playlistId,
+        newName,
+        newDescription,
+      );
+
+      await loadPlaylists(userId);
+    } catch (e, s) {
+      state = AsyncValue.error(e, s);
+    }
+  }
+
   Future<void> addToPlaylist(
       String playlistId, String songId, String userId) async {
     await addSongToPlaylist.execute(playlistId, songId);
-    await loadPlaylists(userId);
     await loadSongsInPlaylist(playlistId);
+    await loadPlaylists(userId);
   }
 
   Future<void> removeSong(
@@ -103,17 +102,6 @@ class PlaylistController
     }
   }
 
-  Future<void> update(
-      String playlistId, String newDescription, String userId) async {
-    try {
-      final repo = ref.read(playlistRepositoryProvider);
-      await repo.updatePlaylist(playlistId, newDescription);
-      await loadPlaylists(userId);
-    } catch (e, s) {
-      state = AsyncValue.error(e, s);
-    }
-  }
-
   Future<void> loadSongsInPlaylist(String playlistId) async {
     final songState = ref.read(playlistControllerProviderSongs.notifier);
     songState.setLoading();
@@ -126,12 +114,35 @@ class PlaylistController
     }
   }
 
-  // =============================================================
-  // DUPLICATE PLAYLIST (BARU)
-  // =============================================================
+  Future<void> loadPlaylistCovers(String userId) async {
+    try {
+      final repo = ref.read(playlistRepositoryProvider);
+      final playlistsList = await listPlaylistUser.execute(userId);
+
+      final Map<String, String?> covers = {};
+
+      for (final p in playlistsList) {
+        final cover = await repo.fetchFirstSongCover(p.id);
+        covers[p.id] = cover;
+      }
+
+      playlistCovers = covers;
+    } catch (e, s) {
+      state = AsyncValue.error(e, s);
+    }
+  }
+
+  Future<void> loadPlaylistsWithoutSongs(String userId) async {
+    try {
+      final data = await listPlaylistUser.execute(userId);
+      state = AsyncValue.data(data);
+    } catch (e, s) {
+      state = AsyncValue.error(e, s);
+    }
+  }
+
   Future<void> duplicate(String playlistId, String userId) async {
     final repo = ref.read(playlistRepositoryProvider);
-
     try {
       await repo.duplicatePlaylist(playlistId);
       await loadPlaylists(userId);

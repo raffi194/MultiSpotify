@@ -23,10 +23,13 @@ class PlaylistRepositoryImpl implements PlaylistRepository {
   }
 
   @override
-  Future<void> updatePlaylist(String id, String description) async {
+  Future<void> updatePlaylist(String id, String name, String description) async {
     await client
         .from('playlists')
-        .update({'description': description})
+        .update({
+          'name': name,
+          'description': description,
+        })
         .eq('id', id);
   }
 
@@ -78,6 +81,7 @@ class PlaylistRepositoryImpl implements PlaylistRepository {
             artist: dto.artist,
             coverUrl: dto.coverUrl,
             audioUrl: dto.audioUrl,
+            uploaderId: dto.uploaderId, // FIX WAJIB DITAMBAHKAN
           ),
         )
         .toList();
@@ -100,8 +104,7 @@ class PlaylistRepositoryImpl implements PlaylistRepository {
         .eq('song_id', songId);
   }
 
-
-    @override
+  @override
   Future<String?> fetchFirstSongCover(String playlistId) async {
     final res = await client
         .from('playlist_songs')
@@ -114,14 +117,10 @@ class PlaylistRepositoryImpl implements PlaylistRepository {
     return res.first['songs']?['cover_url'];
   }
 
-  // =============================================================
-  // DUPLICATE PLAYLIST (BARU)
-  // =============================================================
   @override
   Future<void> duplicatePlaylist(String playlistId) async {
     final user = client.auth.currentUser;
 
-    /// Ambil data playlist
     final source = await client
         .from('playlists')
         .select('*')
@@ -130,7 +129,6 @@ class PlaylistRepositoryImpl implements PlaylistRepository {
 
     if (source == null) return;
 
-    /// Buat playlist baru
     final inserted = await client
         .from('playlists')
         .insert({
@@ -143,13 +141,11 @@ class PlaylistRepositoryImpl implements PlaylistRepository {
 
     final newPlaylistId = inserted['id'];
 
-    /// Ambil semua lagu
     final songs = await client
         .from('playlist_songs')
         .select('song_id')
         .eq('playlist_id', playlistId);
 
-    /// Copy lagu ke playlist baru
     for (final row in songs) {
       await client.from('playlist_songs').insert({
         'playlist_id': newPlaylistId,

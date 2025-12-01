@@ -45,14 +45,10 @@ class _AddSongPageState extends ConsumerState<AddSongPage> {
   Widget build(BuildContext context) {
     final user = ref.watch(authControllerProvider);
 
-    if (user?.email != "admin@gmail.com") {
+    // Only admin can upload songs
+    if (user == null) {
       return const Scaffold(
-        body: Center(
-          child: Text(
-            "Anda tidak memiliki akses admin.",
-            style: TextStyle(color: Colors.white70, fontSize: 18),
-          ),
-        ),
+        body: Center(child: Text("Silakan login dulu.")),
       );
     }
 
@@ -73,15 +69,12 @@ class _AddSongPageState extends ConsumerState<AddSongPage> {
               decoration: const InputDecoration(hintText: "Artist"),
             ),
             const SizedBox(height: 20),
-
             ElevatedButton(
               onPressed: pickCover,
               child: const Text("Pilih Cover"),
             ),
             if (cover != null) Image.file(cover!, height: 150),
-
             const SizedBox(height: 16),
-
             ElevatedButton(
               onPressed: pickAudio,
               child: const Text("Pilih File Audio"),
@@ -91,13 +84,21 @@ class _AddSongPageState extends ConsumerState<AddSongPage> {
                 audio!.path.split('/').last,
                 style: const TextStyle(color: Colors.white70),
               ),
-
             const SizedBox(height: 24),
-
             loading
                 ? const CircularProgressIndicator()
                 : ElevatedButton(
                     onPressed: () async {
+                      if (title.text.trim().isEmpty ||
+                          artist.text.trim().isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text("Judul dan Artist wajib diisi"),
+                          ),
+                        );
+                        return;
+                      }
+
                       if (cover == null || audio == null) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
@@ -121,19 +122,16 @@ class _AddSongPageState extends ConsumerState<AddSongPage> {
                           artist: artist.text.trim(),
                           coverUrl: coverUrl,
                           audioUrl: audioUrl,
+                          uploaderId: user!.id, // ★ FIX WAJIB DITAMBAHKAN
                         );
 
                         await ref
                             .read(songsControllerProvider.notifier)
                             .uploadSong(newSong);
 
-                        await ref
-                            .read(songsControllerProvider.notifier)
-                            .load();
-
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
-                            content: Text("Lagu berhasil ditambahkan!"),  
+                            content: Text("Lagu berhasil ditambahkan!"),
                           ),
                         );
                       } catch (e) {

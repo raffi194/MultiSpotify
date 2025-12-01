@@ -4,20 +4,19 @@ import 'package:collection/collection.dart';
 
 import '../../../core/di/providers.dart';
 
-class PlaylistEditorPage extends ConsumerStatefulWidget {
+class PlaylistEditPage extends ConsumerStatefulWidget {
   final String playlistId;
 
-  const PlaylistEditorPage({
+  const PlaylistEditPage({
     super.key,
     required this.playlistId,
   });
 
   @override
-  ConsumerState<PlaylistEditorPage> createState() =>
-      _PlaylistEditorPageState();
+  ConsumerState<PlaylistEditPage> createState() => _PlaylistEditPageState();
 }
 
-class _PlaylistEditorPageState extends ConsumerState<PlaylistEditorPage> {
+class _PlaylistEditPageState extends ConsumerState<PlaylistEditPage> {
   final name = TextEditingController();
   final description = TextEditingController();
 
@@ -56,7 +55,6 @@ class _PlaylistEditorPageState extends ConsumerState<PlaylistEditorPage> {
 
     return Scaffold(
       appBar: AppBar(
-        // sesuai permintaan Anda → selalu "Edit Playlist"
         title: const Text("Edit Playlist"),
       ),
       body: Padding(
@@ -87,9 +85,6 @@ class _PlaylistEditorPageState extends ConsumerState<PlaylistEditorPage> {
     );
   }
 
-  // ================================================================
-  // LOGIKA EDIT PLAYLIST (FINAL)
-  // ================================================================
   Future<void> _onSave(user) async {
     if (user == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -101,19 +96,16 @@ class _PlaylistEditorPageState extends ConsumerState<PlaylistEditorPage> {
     final newName = name.text.trim();
     final newDesc = description.text.trim();
 
-    // VALIDASI NAMA WAJIB
     if (newName.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Nama playlist belum diisi")),
+        const SnackBar(content: Text("Nama playlist harus diisi")),
       );
       return;
     }
 
-    // CEK PERUBAHAN
     final changedName = newName != originalName;
     final changedDesc = newDesc != originalDescription;
 
-    // Jika tidak ada perubahan, tidak memanggil update
     if (!changedName && !changedDesc) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Tidak ada perubahan.")),
@@ -121,10 +113,8 @@ class _PlaylistEditorPageState extends ConsumerState<PlaylistEditorPage> {
       return;
     }
 
-    // Mulai loading
     setState(() => loading = true);
 
-    // UPDATE PLAYLIST (sesuai logika Anda)
     await ref.read(playlistControllerProvider.notifier).updatePlaylist(
           widget.playlistId,
           newName,
@@ -132,12 +122,11 @@ class _PlaylistEditorPageState extends ConsumerState<PlaylistEditorPage> {
           user.id,
         );
 
-    // Notifikasi sukses
+    setState(() => loading = false);
+
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text("Playlist berhasil diperbarui")),
     );
-
-    setState(() => loading = false);
 
     Navigator.pop(context);
   }

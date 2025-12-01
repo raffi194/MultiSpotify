@@ -19,8 +19,7 @@ class PlaylistDetailPage extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<PlaylistDetailPage> createState() =>
-      _PlaylistDetailPageState();
+  ConsumerState<PlaylistDetailPage> createState() => _PlaylistDetailPageState();
 }
 
 class _PlaylistDetailPageState extends ConsumerState<PlaylistDetailPage> {
@@ -63,14 +62,12 @@ class _PlaylistDetailPageState extends ConsumerState<PlaylistDetailPage> {
     return Scaffold(
       extendBodyBehindAppBar: true,
       bottomNavigationBar: const NavbarBottom(index: 2),
-
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _openAddSong(user.id),
         backgroundColor: Colors.greenAccent.shade700,
         icon: const Icon(Icons.add),
         label: const Text("Tambah Lagu"),
       ),
-
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -81,7 +78,6 @@ class _PlaylistDetailPageState extends ConsumerState<PlaylistDetailPage> {
           ),
         ],
       ),
-
       body: playlist == null
           ? const Center(child: CircularProgressIndicator())
           : CustomScrollView(
@@ -268,8 +264,7 @@ class _PlaylistDetailPageState extends ConsumerState<PlaylistDetailPage> {
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: const Color(0xFF1B1B1B),
-        title: const Text("Hapus Lagu",
-            style: TextStyle(color: Colors.white)),
+        title: const Text("Hapus Lagu", style: TextStyle(color: Colors.white)),
         content: const Text(
           "Yakin ingin menghapus lagu ini dari playlist?",
           style: TextStyle(color: Colors.white70),
@@ -280,8 +275,7 @@ class _PlaylistDetailPageState extends ConsumerState<PlaylistDetailPage> {
             onPressed: () => Navigator.pop(context),
           ),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.redAccent),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
             onPressed: () async {
               Navigator.pop(context);
               await ref
@@ -321,18 +315,18 @@ class _PlaylistDetailPageState extends ConsumerState<PlaylistDetailPage> {
               ),
               const SizedBox(height: 20),
 
-              // Edit
+              // EDIT
               ListTile(
                 leading: const Icon(Icons.edit, color: Colors.white),
                 title: const Text("Edit Playlist",
                     style: TextStyle(color: Colors.white)),
                 onTap: () {
                   Navigator.pop(context);
-                  context.push('/playlist-editor?id=${playlist.id}');
+                  context.push('/playlist-edit/${playlist.id}');
                 },
               ),
 
-              // Duplicate
+              // DUPLICATE
               ListTile(
                 leading: const Icon(Icons.copy, color: Colors.white),
                 title: const Text("Duplikasi Playlist",
@@ -345,7 +339,7 @@ class _PlaylistDetailPageState extends ConsumerState<PlaylistDetailPage> {
                 },
               ),
 
-              // Delete
+              // DELETE
               ListTile(
                 leading: const Icon(Icons.delete, color: Colors.redAccent),
                 title: const Text("Hapus Playlist",
@@ -367,8 +361,8 @@ class _PlaylistDetailPageState extends ConsumerState<PlaylistDetailPage> {
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: const Color(0xFF1B1B1B),
-        title: const Text("Hapus Playlist",
-            style: TextStyle(color: Colors.white)),
+        title:
+            const Text("Hapus Playlist", style: TextStyle(color: Colors.white)),
         content: const Text(
           "Playlist akan dihapus permanen.",
           style: TextStyle(color: Colors.white70),

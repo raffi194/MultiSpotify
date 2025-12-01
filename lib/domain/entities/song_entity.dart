@@ -4,6 +4,7 @@ class SongEntity {
   final String artist;
   final String coverUrl;
   final String audioUrl;
+  final String uploaderId; // NEW
 
   SongEntity({
     required this.id,
@@ -11,5 +12,6 @@ class SongEntity {
     required this.artist,
     required this.coverUrl,
     required this.audioUrl,
+    required this.uploaderId,
   });
 }

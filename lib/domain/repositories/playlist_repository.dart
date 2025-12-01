@@ -3,7 +3,10 @@ import '../entities/song_entity.dart';
 
 abstract class PlaylistRepository {
   Future<void> createPlaylist(String name, String description);
-  Future<void> updatePlaylist(String id, String description);
+
+  // Perbaikan: menerima name + description
+  Future<void> updatePlaylist(String id, String name, String description);
+
   Future<void> deletePlaylist(String id);
 
   Future<List<PlaylistEntity>> listPlaylists(String userId);
@@ -14,6 +17,5 @@ abstract class PlaylistRepository {
 
   Future<void> duplicatePlaylist(String playlistId);
 
-  // Batch 7 — ambil cover lagu pertama
   Future<String?> fetchFirstSongCover(String playlistId);
 }
