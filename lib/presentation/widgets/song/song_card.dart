@@ -13,10 +13,10 @@ class SongCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(authControllerProvider);
-    final favorites = ref.watch(favoriteControllerProvider);
+    // final favorites = ref.watch(favoriteControllerProvider);
 
-    final isFavorite =
-        favorites.asData?.value.any((f) => f.songId == song.id) ?? false;
+    // final isFavorite =
+    //     favorites.asData?.value.any((f) => f.songId == song.id) ?? false;
 
     final isMine = user?.id == song.uploaderId;
 
@@ -87,17 +87,17 @@ class SongCard extends ConsumerWidget {
             // ============================================================
             // FAVORITE BUTTON
             // ============================================================
-            IconButton(
-              onPressed: () {
-                ref
-                    .read(favoriteControllerProvider.notifier)
-                    .toggleFavorite(song.id);
-              },
-              icon: Icon(
-                isFavorite ? Icons.favorite : Icons.favorite_border,
-                color: isFavorite ? Colors.greenAccent : Colors.white60,
-              ),
-            ),
+            // IconButton(
+            //   onPressed: () {
+            //     ref
+            //         .read(favoriteControllerProvider.notifier)
+            //         .toggleFavorite(song.id);
+            //   },
+            //   icon: Icon(
+            //     isFavorite ? Icons.favorite : Icons.favorite_border,
+            //     color: isFavorite ? Colors.greenAccent : Colors.white60,
+            //   ),
+            // ),
           ],
         ),
       ),

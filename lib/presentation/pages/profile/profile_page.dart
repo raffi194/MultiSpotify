@@ -53,6 +53,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         backgroundColor: const Color(0xFF0C0C0C),
         body: CustomScrollView(
           slivers: [
+            // ============================================================
+            // HEADER
+            // ============================================================
             SliverAppBar(
               expandedHeight: 250,
               pinned: true,
@@ -93,13 +96,16 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               ),
             ),
 
-            // CONTENT BODY
+            // ============================================================
+            // BODY
+            // ============================================================
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.all(20),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // EMAIL
                     Text(
                       user?.email ?? "",
                       style: const TextStyle(
@@ -111,9 +117,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
                     const SizedBox(height: 20),
 
-                    // =========================================================
                     // BUTTON: Kembali ke Home
-                    // =========================================================
                     ElevatedButton(
                       onPressed: () => context.go('/'),
                       style: ElevatedButton.styleFrom(
@@ -133,7 +137,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
                     const SizedBox(height: 16),
 
-                    // EDIT PROFILE
+                    // EDIT PROFILE BUTTON
                     ElevatedButton(
                       onPressed: () => showModalBottomSheet(
                         context: context,
@@ -146,7 +150,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
                     const SizedBox(height: 30),
 
-                    // UPLOAD LAGU
+                    // UPLOAD LAGU BUTTON
                     ElevatedButton(
                       onPressed: () {
                         showModalBottomSheet(
@@ -171,6 +175,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
                     const SizedBox(height: 20),
 
+                    // LIHAT LAGU SAYA
                     ElevatedButton(
                       onPressed: () => context.push('/my-songs'),
                       style: ElevatedButton.styleFrom(
@@ -181,7 +186,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
                     const SizedBox(height: 30),
 
+                    // ============================================================
                     // PLAYLIST HEADER
+                    // ============================================================
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -205,6 +212,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
                     const SizedBox(height: 10),
 
+                    // PLAYLIST COUNTER (AMAN)
                     playlists.maybeWhen(
                       data: (list) {
                         return Text(
@@ -220,19 +228,10 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
                     const SizedBox(height: 20),
 
-                    playlists.when(
-                      data: (list) => list.isEmpty
-                          ? const Text(
-                              "Belum ada playlist. Buat playlist pertama kamu!",
-                              style: TextStyle(color: Colors.white54),
-                            )
-                          : PlaylistPreviewList(playlists: list),
-                      loading: () => const PlaylistPreviewShimmer(),
-                      error: (e, s) => Text(
-                        "Error: $e",
-                        style: const TextStyle(color: Colors.redAccent),
-                      ),
-                    ),
+                    // ============================================================
+                    // PLAYLIST PREVIEW (WRAPPED)
+                    // ============================================================
+                    _buildPlaylistPreview(playlists),
 
                     const SizedBox(height: 50),
 
@@ -266,6 +265,28 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  // ============================================================
+  // WRAPPER: PLAYLIST PREVIEW SAFE VERSION
+  // ============================================================
+  Widget _buildPlaylistPreview(AsyncValue playlists) {
+    return playlists.when(
+      data: (list) {
+        if (list.isEmpty) {
+          return const Text(
+            "Belum ada playlist. Buat playlist pertama kamu!",
+            style: TextStyle(color: Colors.white54),
+          );
+        }
+        return PlaylistPreviewList(playlists: list);
+      },
+      loading: () => const PlaylistPreviewShimmer(),
+      error: (e, s) => Text(
+        "Error: $e",
+        style: const TextStyle(color: Colors.redAccent),
       ),
     );
   }

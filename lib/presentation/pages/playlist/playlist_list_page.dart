@@ -35,11 +35,12 @@ class _PlaylistListPageState extends ConsumerState<PlaylistListPage> {
       appBar: AppBar(
         title: const Text("Kelola Playlist"),
         backgroundColor: const Color(0xFF0C0C0C),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
+          onPressed: () => context.go('/profile'),
+        ),
       ),
 
-      // ==========================================================
-      // FLOATING BUTTON → BUAT PLAYLIST
-      // ==========================================================
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => context.push('/playlist-create'),
         backgroundColor: Colors.greenAccent.shade700,
@@ -48,11 +49,13 @@ class _PlaylistListPageState extends ConsumerState<PlaylistListPage> {
       ),
 
       body: playlists.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const Center(
+          child: CircularProgressIndicator(color: Colors.white),
+        ),
 
         error: (e, s) => Center(
           child: Text(
-            "Gagal memuat playlist",
+            "Gagal memuat playlist: $e",
             style: const TextStyle(color: Colors.redAccent),
           ),
         ),
@@ -103,20 +106,16 @@ class _PlaylistListPageState extends ConsumerState<PlaylistListPage> {
                         }
                       },
 
-                      itemBuilder: (_) => [
-                        const PopupMenuItem(
+                      itemBuilder: (_) => const [
+                        PopupMenuItem(
                           value: "edit",
-                          child: Text(
-                            "Edit Playlist",
-                            style: TextStyle(color: Colors.white),
-                          ),
+                          child: Text("Edit Playlist",
+                              style: TextStyle(color: Colors.white)),
                         ),
-                        const PopupMenuItem(
+                        PopupMenuItem(
                           value: "delete",
-                          child: Text(
-                            "Hapus Playlist",
-                            style: TextStyle(color: Colors.redAccent),
-                          ),
+                          child: Text("Hapus Playlist",
+                              style: TextStyle(color: Colors.redAccent)),
                         ),
                       ],
                     ),

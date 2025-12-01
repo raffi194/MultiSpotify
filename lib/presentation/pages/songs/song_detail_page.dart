@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/di/providers.dart';
-import '../../helpers/favorite_helper.dart';
+// import '../../helpers/favorite_helper.dart';
 import '../../widgets/audio_player_widget.dart';
-import '../../widgets/navbar_bottom.dart';
+// import '../../widgets/navbar_bottom.dart';
 import '../playlist/playlist_picker_modal.dart';
 
 class SongDetailPage extends ConsumerWidget {
@@ -28,7 +28,7 @@ class SongDetailPage extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(title: Text(song.title)),
-      bottomNavigationBar: const NavbarBottom(index: 1),
+      // bottomNavigationBar: const NavbarBottom(index: 1),
       body: Padding(
         padding: const EdgeInsets.all(18),
         child: Column(
@@ -51,12 +51,12 @@ class SongDetailPage extends ConsumerWidget {
 
             const SizedBox(height: 12),
 
-            ElevatedButton.icon(
-              onPressed: () =>
-                  FavoriteHelper.handleFavorite(context, ref, songId),
-              icon: const Icon(Icons.favorite),
-              label: const Text("Favoritkan"),
-            ),
+            // ElevatedButton.icon(
+            //   onPressed: () =>
+            //       FavoriteHelper.handleFavorite(context, ref, songId),
+            //   icon: const Icon(Icons.favorite),
+            //   label: const Text("Favoritkan"),
+            // ),
 
             const SizedBox(height: 12),
 

@@ -5,7 +5,7 @@ import '../../domain/entities/song_entity.dart';
 import '../controllers/playlist_controller.dart';
 import 'add_to_playlist_modal.dart';
 import 'create_playlist_modal.dart';
-import 'favorite_button.dart';
+// import 'favorite_button.dart';
 import 'package:go_router/go_router.dart';
 
 class SongCard extends ConsumerWidget {
@@ -53,38 +53,38 @@ class SongCard extends ConsumerWidget {
               ),
             ),
 
-            FavoriteButton(
-              onTap: () async {
-                final playlists =
-                    ref.read(playlistControllerProvider).value ?? [];
+            // FavoriteButton(
+            //   onTap: () async {
+            //     final playlists =
+            //         ref.read(playlistControllerProvider).value ?? [];
 
-                if (playlists.isEmpty) {
-                  showDialog(
-                    context: context,
-                    builder: (_) => CreatePlaylistModal(
-                      onSubmit: (name, desc) async {
-                        await ref
-                            .read(playlistControllerProvider.notifier)
-                            .create(name, desc, userId);
-                      },
-                    ),
-                  );
-                } else {
-                  showDialog(
-                    context: context,
-                    builder: (_) => AddToPlaylistModal(
-                      playlists: playlists,
-                      onSelect: (pid) async {
-                        await ref
-                            .read(playlistControllerProvider.notifier)
-                            .addToPlaylist(pid, song.id, userId);
-                        Navigator.pop(context);
-                      },
-                    ),
-                  );
-                }
-              },
-            ),
+            //     if (playlists.isEmpty) {
+            //       showDialog(
+            //         context: context,
+            //         builder: (_) => CreatePlaylistModal(
+            //           onSubmit: (name, desc) async {
+            //             await ref
+            //                 .read(playlistControllerProvider.notifier)
+            //                 .create(name, desc, userId);
+            //           },
+            //         ),
+            //       );
+            //     } else {
+            //       showDialog(
+            //         context: context,
+            //         builder: (_) => AddToPlaylistModal(
+            //           playlists: playlists,
+            //           onSelect: (pid) async {
+            //             await ref
+            //                 .read(playlistControllerProvider.notifier)
+            //                 .addToPlaylist(pid, song.id, userId);
+            //             Navigator.pop(context);
+            //           },
+            //         ),
+            //       );
+            //     }
+            //   },
+            // ),
           ],
         ),
       ),

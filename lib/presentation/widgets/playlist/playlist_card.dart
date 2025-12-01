@@ -116,17 +116,15 @@ class PlaylistCard extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 20),
-
               ListTile(
                 leading: const Icon(Icons.edit, color: Colors.white),
                 title: const Text("Edit Playlist",
                     style: TextStyle(color: Colors.white)),
                 onTap: () {
                   Navigator.pop(context);
-                  context.push('/playlist-editor?id=${playlist.id}');
+                  context.push('/playlist-edit/${playlist.id}');
                 },
               ),
-
               ListTile(
                 leading: const Icon(Icons.copy, color: Colors.white),
                 title: const Text("Duplikasi Playlist",
@@ -141,7 +139,6 @@ class PlaylistCard extends ConsumerWidget {
                       .duplicate(playlist.id, user.id);
                 },
               ),
-
               ListTile(
                 leading: const Icon(Icons.delete, color: Colors.redAccent),
                 title: const Text("Hapus Playlist",
@@ -178,8 +175,7 @@ class PlaylistCard extends ConsumerWidget {
             onPressed: () => Navigator.pop(context),
           ),
           ElevatedButton(
-            style:
-                ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
             onPressed: () async {
               Navigator.pop(context);
               await ref
